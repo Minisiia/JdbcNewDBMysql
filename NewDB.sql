@@ -1,0 +1,9 @@
+CREATE DATABASE testDB;
+USE testDB;
+DROP TABLE testtable;
+CREATE TABLE testtable(
+id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+name VARCHAR(20),
+age INT,
+favouriteColor VARCHAR(20)
+);
