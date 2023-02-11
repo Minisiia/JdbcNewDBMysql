@@ -1,6 +1,7 @@
 package insert_db;
 
 import java.sql.*;
+import java.util.concurrent.Callable;
 
 /**
  * Создать базу данных в Workbench и подключить к IntelijIdea и создать тестовую таблицу.
@@ -17,6 +18,7 @@ public class Main {
         Connection connection = null;
         Statement st = null;
         PreparedStatement ps = null;
+        CallableStatement cs = null;
 
         // static Statement INSERT, DELETE, UPDATE
         try {
@@ -107,6 +109,53 @@ public class Main {
                 e.printStackTrace();
             }
         }
+
+        // Transaction
+        try {
+            connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
+            connection.setAutoCommit(false);
+            ps = connection.prepareStatement("INSERT INTO testtable(name, age, favouriteColor) VALUES (?, ?, ?);");
+            ps.setString(1,"Kate");
+            ps.setInt(2,11);
+            ps.setString(3,"white");
+            ps.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
+            e.printStackTrace();
+        } finally {
+            try {
+                ps.close();
+                connection.setAutoCommit(true);
+                connection.close();
+                } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Callable Statement INSERT
+        try {
+            connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
+            cs = connection.prepareCall("{CALL insert_info(?,?,?)}");
+            cs.setString(1,"Clara");
+            cs.setInt(2,66);
+            cs.setString(3,"violet");
+            cs.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+                cs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
     private static void registerDriver() {
         try {
