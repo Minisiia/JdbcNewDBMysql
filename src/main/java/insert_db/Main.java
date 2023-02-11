@@ -1,9 +1,11 @@
 package insert_db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+
+/**
+ * Создать базу данных в Workbench и подключить к IntelijIdea и создать тестовую таблицу.
+ * Заполнить ее данными с помощью запросов MySQL в IntelijIdea. Используя JDBC написать пример выполнения всех запросов.
+ */
 
 public class Main {
     private static final String URL = "jdbc:mysql://localhost:3306/testdb";
@@ -13,31 +15,97 @@ public class Main {
         registerDriver();
 
         Connection connection = null;
-        Statement statement = null;
+        Statement st = null;
+        PreparedStatement ps = null;
 
-
+        // static Statement
         try {
             connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
-            statement = connection.createStatement();
+            st = connection.createStatement();
 
-            //
+            st.execute("INSERT INTO testtable(name, age, favouriteColor) VALUES ('Mia', 15, 'pink')");
 
-            //statement.execute("INSERT INTO testtable(name, age, favouriteColor) VALUES ('Mia', 15, 'pink')");
+            st.addBatch("INSERT INTO testtable(name, age, favouriteColor) VALUES ('Lina', 22, 'black')");
+            st.addBatch("INSERT INTO testtable(name, age, favouriteColor) VALUES ('Lola', 10, 'purple')");
+            st.addBatch("INSERT INTO testtable(name, age, favouriteColor) VALUES ('Sia', 16, 'yellow')");
+            st.executeBatch();
+            st.execute("DELETE FROM testtable WHERE name='Lola';");
+            st.execute("UPDATE testtable SET age=17 WHERE name='Sia';");
 
-            statement.addBatch("INSERT INTO testtable(name, age, favouriteColor) VALUES ('Lina', 22, 'black')");
-            statement.addBatch("INSERT INTO testtable(name, age, favouriteColor) VALUES ('Lola', 10, 'purple')");
-            statement.addBatch("INSERT INTO testtable(name, age, favouriteColor) VALUES ('Sia', 16, 'yellow')");
-            statement.executeBatch();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
                 connection.close();
-                statement.close();
+                st.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+        }
 
+        // Prepared Statement INSERT
+        try {
+            connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
+            ps = connection.prepareStatement("INSERT INTO testtable(name, age, favouriteColor) VALUES (?, ?, ?)");
+            ps.setString(1,"Mimi");
+            ps.setInt(2,9);
+            ps.setString(3,"green");
+            ps.executeUpdate();
+
+            ps.setString(1,"Lili");
+            ps.setInt(2,8);
+            ps.setString(3,"grey");
+            ps.executeUpdate();
+
+            ps.setString(1,"Nana");
+            ps.setInt(2,8);
+            ps.setString(3,"blue");
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Prepared Statement DELETE
+        try {
+            connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
+            ps = connection.prepareStatement("DELETE FROM testtable WHERE name=?;");
+            ps.setString(1,"Nana");
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Prepared Statement UPDATE
+        try {
+            connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
+            ps = connection.prepareStatement("UPDATE testtable SET age=? WHERE name=?;");
+            ps.setInt(1,100);
+            ps.setString(2,"Lili");
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+                ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
     private static void registerDriver() {
