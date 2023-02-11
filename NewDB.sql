@@ -7,3 +7,5 @@ name VARCHAR(20),
 age INT,
 favouriteColor VARCHAR(20)
 );
+
+SELECT * FROM testtable;
