@@ -18,7 +18,7 @@ public class Main {
         Statement st = null;
         PreparedStatement ps = null;
 
-        // static Statement
+        // static Statement INSERT, DELETE, UPDATE
         try {
             connection = DriverManager.getConnection(URL, LOGIN, PASSWORD);
             st = connection.createStatement();
